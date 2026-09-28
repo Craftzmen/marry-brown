@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marrybrown UAE: Mobile ordering prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--fg:#0a0a0a;--mut:#5f5f5f;--line:#d6d6d6;--soft:#f2f2f2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a0a0a;--fg:#f5f5f5;--mut:#a3a3a3;--line:#333;--soft:#171717}}
+:root[data-theme="dark"]{--bg:#0a0a0a;--fg:#f5f5f5;--mut:#a3a3a3;--line:#333;--soft:#171717}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:'Archivo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;line-height:1.45;overflow:hidden}
+.deck{height:100%;position:relative}
+.slide{position:absolute;inset:0 0 56px 0;padding:clamp(20px,5vw,64px);overflow-y:auto;display:none;flex-direction:column;justify-content:center}
+.slide.on{display:flex}
+h1{font-size:clamp(38px,8vw,92px);line-height:.98;margin:0 0 20px;font-weight:800;letter-spacing:-.03em}
+h2{font-size:clamp(26px,4.4vw,48px);line-height:1.05;margin:0 0 28px;font-weight:800;letter-spacing:-.02em;max-width:22ch}
+p{margin:0;max-width:60ch}
+.mut{color:var(--mut)}
+.big{font-size:clamp(16px,2vw,22px)}
+table{border-collapse:collapse;width:100%;max-width:900px}
+th,td{text-align:left;padding:14px 12px 14px 0;border-bottom:1px solid var(--line);font-size:clamp(14px,1.8vw,20px)}
+th{font-weight:600;color:var(--mut);font-size:14px}
+td.n{font-weight:800}
+ul{margin:0;padding:0;list-style:none;display:grid;gap:14px;max-width:820px}
+li{padding-bottom:14px;border-bottom:1px solid var(--line);font-size:clamp(15px,1.8vw,19px)}
+li b{display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px);max-width:1000px}
+.box{border:1px solid var(--fg);padding:24px}
+.box h3{margin:0 0 4px;font-size:22px}
+.box ul{margin-top:16px;gap:8px}
+.box li{font-size:16px;padding-bottom:8px}
+.phones{display:flex;gap:28px;overflow-x:auto;padding:4px 4px 12px;align-items:flex-start}
+.fig{flex:0 0 auto;width:232px}
+.fig p{font-size:14px;margin-top:12px;color:var(--mut)}
+.fig p b{color:var(--fg)}
+/* phone: fixed light palette */
+.ph{width:232px;height:456px;border:6px solid #0a0a0a;border-radius:30px;background:#fff;color:#0a0a0a;position:relative;overflow:hidden;font-size:11px;line-height:1.3}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #e3e3e3;font-weight:800;font-size:13px}
+.bar span{font-weight:600;font-size:11px}
+.seg{display:flex;margin:10px 12px 6px;border:1px solid #0a0a0a;border-radius:8px;overflow:hidden}
+.seg i{flex:1;text-align:center;padding:6px;font-style:normal;font-weight:600}
+.seg i.a{background:#0a0a0a;color:#fff}
+.field{margin:6px 12px;padding:8px;border:1px solid #cfcfcf;border-radius:8px}
+.field small{display:block;color:#666;font-size:10px}
+.hero{margin:10px 12px;padding:14px;background:#0a0a0a;color:#fff;border-radius:12px}
+.hero b{font-size:17px;line-height:1.1;display:block;margin-bottom:4px}
+.btn{display:block;text-align:center;background:#fff;color:#0a0a0a;border-radius:8px;padding:9px;font-weight:800;margin-top:10px}
+.btn.k{background:#0a0a0a;color:#fff;margin:8px 12px}
+.chips{display:flex;gap:6px;padding:8px 12px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 80%,transparent);mask-image:linear-gradient(90deg,#000 80%,transparent)}
+.chips i{font-style:normal;border:1px solid #0a0a0a;border-radius:99px;padding:5px 10px;white-space:nowrap;font-weight:600}
+.chips i.a{background:#0a0a0a;color:#fff}
+.row{display:flex;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid #eee}
+.row .im{width:44px;height:44px;border-radius:8px;background:#ececec;flex:none}
+.row div{flex:1}.row small{color:#666;display:block;font-size:10px}
+.row .add{flex:none;width:28px;height:28px;border-radius:50%;background:#0a0a0a;color:#fff;text-align:center;line-height:28px;font-weight:800;font-size:15px}
+.cartbar{position:absolute;left:10px;right:10px;bottom:10px;background:#0a0a0a;color:#fff;border-radius:12px;padding:12px;display:flex;justify-content:space-between;font-weight:800}
+.lbl{padding:8px 12px 0;font-weight:800;font-size:12px}
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 12px}
+.pay i{font-style:normal;text-align:center;padding:9px 4px;border:1px solid #0a0a0a;border-radius:8px;font-weight:600}
+.pay i.a{background:#0a0a0a;color:#fff}
+.tot{display:flex;justify-content:space-between;margin:10px 12px 0;font-weight:800;font-size:13px}
+nav{position:fixed;left:0;right:0;bottom:0;height:calc(56px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);display:flex;align-items:center;justify-content:space-between;padding-left:clamp(20px,5vw,64px);padding-right:clamp(20px,5vw,64px);border-top:1px solid var(--line);background:var(--bg);font-size:14px}
+nav button{font:inherit;background:none;color:var(--fg);border:1px solid var(--fg);border-radius:8px;min-height:44px;min-width:44px;padding:0 16px;cursor:pointer}
+nav button:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.opt{display:flex;align-items:center;gap:8px;margin:0 12px;padding:8px 0;border-bottom:1px solid #eee}.opt i{width:14px;height:14px;border:2px solid #0a0a0a;border-radius:50%;flex:none}.opt i.a{background:#0a0a0a;box-shadow:inset 0 0 0 2px #fff}.opt span{flex:1}.opt em,.row em{font-style:normal;font-weight:600;flex:none}
+.t{margin:12px;max-width:none;color:#444}
+.ctr{text-align:center;padding:26px 14px}.ctr b{display:block;font-size:19px;line-height:1.15;margin-bottom:6px}
+.map{margin:8px 12px;height:150px;border-radius:10px;border:1px solid #cfcfcf;position:relative;background:repeating-linear-gradient(0deg,transparent 0 24px,#e6e6e6 24px 25px),repeating-linear-gradient(90deg,transparent 0 24px,#e6e6e6 24px 25px),#f4f4f4}.map b{position:absolute;width:14px;height:14px;border-radius:50%;background:#0a0a0a;border:2px solid #fff}
+.toast{position:absolute;left:24px;right:24px;bottom:64px;background:#0a0a0a;color:#fff;border-radius:99px;padding:9px;text-align:center;font-weight:600}
+.flow{display:flex;gap:10px;flex-wrap:wrap;max-width:1000px}.flow .box{flex:1 1 150px;padding:16px}.flow .box b{display:block;font-size:18px;margin-bottom:4px}
+@media (max-width:720px){.two{grid-template-columns:1fr}.slide{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<section class="slide on">
+<h1>Marrybrown UAE<br>Mobile ordering, redesigned</h1>
+<p class="big mut">Prototype presentation. From "I want chicken" to "order placed" in under a minute, on a phone.</p>
+</section>
+
+<section class="slide">
+<h2>The site loses orders before it shows the menu</h2>
+<table>
+<tr><th>Homepage on a phone</th><th>Today</th><th>Target</th></tr>
+<tr><td>Wait before the page starts</td><td class="n">5.4 sec</td><td class="n">under 0.5 sec</td></tr>
+<tr><td>Wait until the main content shows</td><td class="n">10.1 sec</td><td class="n">under 2 sec</td></tr>
+<tr><td>Data used to open the page</td><td class="n">13.7 MB</td><td class="n">under 1.2 MB</td></tr>
+<tr><td>Files downloaded</td><td class="n">350</td><td class="n">under 60</td></tr>
+<tr><td>Taps from homepage to checkout</td><td class="n">5 to 6</td><td class="n">3</td></tr>
+</table>
+</section>
+
+<section class="slide">
+<h2>What customers run into today</h2>
+<ul>
+<li><b>Every page takes 8 to 14 seconds to show its content.</b>Caching is switched off by a shop setting.</li>
+<li><b>The floating cart button covers "Add to Cart" on phones.</b>Product after product loses its button.</li>
+<li><b>The store map never loads.</b>Customers see an empty grey box.</li>
+<li><b>A bestseller leads to "Page Not Found", and a "TEST" category is public.</b>The site looks unfinished.</li>
+<li><b>There is no "Order now" or delivery/pickup choice on the first screen.</b></li>
+</ul>
+</section>
+
+<section class="slide">
+<h2>The prototype: three screens, one job</h2>
+<div class="phones">
+
+<div class="fig"><div class="ph">
+<div class="bar">Marrybrown<span>Cart</span></div>
+<div class="seg"><i class="a">Delivery</i><i>Pickup</i></div>
+<div class="field"><small>Deliver to</small>Al Barsha, Dubai</div>
+<div class="field"><small>Nearest branch</small>Al Barsha. 25 to 35 min. Open until 1am</div>
+<div class="hero"><b>Smoky Grilled Chicken</b>Bowls from AED 13<span class="btn">Order now</span></div>
+<div class="chips"><i class="a">Deals</i><i>Chicken</i><i>Family</i><i>Burgers</i></div>
+<div class="row"><div class="im"></div><div><b>Big Meal</b><small>AED 32</small></div><span class="add">+</span></div>
+</div><p><b>Home.</b> Order box first. Delivery or pickup, address, nearest open branch.</p></div>
+
+<div class="fig"><div class="ph">
+<div class="bar">Marrybrown<span>Cart</span></div>
+<div class="chips"><i class="a">Deals</i><i>Chicken</i><i>Family</i><i>Burgers</i></div>
+<div class="row"><div class="im"></div><div><b>Big Meal</b><small>3 pc chicken, fries, drink<br>AED 32</small></div><span class="add">+</span></div>
+<div class="row"><div class="im"></div><div><b>Meal for Two</b><small>5 pc, 2 sides, 2 drinks<br>AED 49</small></div><span class="add">+</span></div>
+<div class="row"><div class="im"></div><div><b>Mac N Cheese</b><small>AED 15</small></div><span class="add">+</span></div>
+<div class="row"><div class="im"></div><div><b>Spaghetti W Burger</b><small>AED 15</small></div><span class="add">+</span></div>
+<div class="cartbar"><span>2 items, AED 81</span><span>View cart</span></div>
+</div><p><b>Menu.</b> Swipeable categories, one-tap add, cart bar that never covers a button.</p></div>
+
+<div class="fig"><div class="ph">
+<div class="bar">Checkout<span>No account needed</span></div>
+<div class="field"><small>Phone</small>+971 5X XXX XXXX</div>
+<div class="field"><small>Address</small>Al Barsha, Dubai</div>
+<div class="field"><small>Time</small>As soon as possible. 25 to 35 min</div>
+<div class="lbl">Pay with</div>
+<div class="pay"><i class="a">Apple Pay</i><i>Google Pay</i><i>Card</i><i>Cash</i></div>
+<div class="tot"><span>Total</span><span>AED 81</span></div>
+<span class="btn k">Place order</span>
+</div><p><b>Checkout.</b> One page. Rewards sign-up comes after payment.</p></div>
+
+</div>
+<p class="mut" style="font-size:13px;margin-top:8px">Sketch only. Prices, branch details and photos are placeholders.</p>
+</section>
+
+<section class="slide">
+<h2>What changes, and why</h2>
+<ul>
+<li><b>Slim top bar.</b>The food starts on the first screen.</li>
+<li><b>Order box and one main offer.</b>Prices are real text, with a single "Order now" button.</li>
+<li><b>Swipeable, sticky categories.</b>Customers always know where they are in the menu.</li>
+<li><b>Cart bar at the bottom.</b>It appears only once something is in the cart.</li>
+<li><b>Branch-aware menu, Arabic and English.</b>Only what is available at the chosen branch is shown.</li>
+</ul>
+</section>
+
+<section class="slide">
+<h2>Two ways to get there</h2>
+<div class="two">
+<div class="box"><h3>Option A: Fix the current site</h3><p class="mut">2 to 4 weeks. Low cost, low risk. Start here.</p>
+<ul><li>Keep WordPress and WooCommerce</li><li>Remove extra page builders and duplicate add-ons</li><li>Fix caching so pages load in under a second</li><li>Rebuild home, menu and cart to match the prototype</li></ul></div>
+<div class="box"><h3>Option B: Rebuild the front end</h3><p class="mut">3 to 4 months. Higher cost, app-like feel.</p>
+<ul><li>New, very fast front end served close to customers</li><li>WooCommerce or a restaurant system linked to the tills</li><li>Arabic, Apple Pay, Google Pay, rewards, order tracking</li><li>Makes a future mobile app easier</li></ul></div>
+</div>
+</section>
+
+<section class="slide">
+<h2>Plan and next step</h2>
+<table>
+<tr><th>When</th><th>What</th></tr>
+<tr><td class="n">Week 1</td><td>Fix Big Meal link, hide TEST category, remove staff pages, secure admin, move the cart button</td></tr>
+<tr><td class="n">Weeks 2 to 3</td><td>Fix caching, maps, add-ons, video and images, tracking</td></tr>
+<tr><td class="n">Weeks 3 to 6</td><td>Order box, slim top bar, category buttons, one-page checkout, restaurant data for Google</td></tr>
+<tr><td class="n">Next 3 months</td><td>Arabic, branch menus, live order updates, rewards. Then decide on Option B</td></tr>
+</table>
+<p class="big" style="margin-top:28px"><b>Next step:</b> approve Option A and the week 1 fixes.</p>
+</section>
+
+</div>
+<nav><button id="p" aria-label="Previous slide">Back</button><span id="c" aria-live="polite">1 / 20</span><button id="n" aria-label="Next slide">Next</button></nav>
+<script>
+var I=function(s,d){return s.split(d).map(function(t){return '<i'+(t[0]=='*'?' class="a"':'')+'>'+t.replace('*','')+'</i>'}).join('')};
+var T={bar:x=>`<div class="bar">${x[0]}<span>${x[1]||''}</span></div>`,seg:x=>`<div class="seg">${I(x[0],'|')}</div>`,chips:x=>`<div class="chips">${I(x[0],',')}</div>`,pay:x=>`<div class="pay">${I(x[0],'|')}</div>`,
+field:x=>`<div class="field"><small>${x[0]}</small>${x[1]}</div>`,row:x=>`<div class="row"><div class="im"></div><div><b>${x[0]}</b><small>${x[1]}</small></div>${x[2]?'<em>'+x[2]+'</em>':'<span class="add">+</span>'}</div>`,
+hero:x=>`<div class="hero"><b>${x[0]}</b>${x[1]}${x[2]?'<span class="btn">'+x[2]+'</span>':''}</div>`,btn:x=>`<span class="btn k">${x[0]}</span>`,cart:x=>`<div class="cartbar"><span>${x[0]}</span><span>${x[1]}</span></div>`,
+lbl:x=>`<div class="lbl">${x[0]}</div>`,tot:x=>`<div class="tot"><span>${x[0]}</span><span>${x[1]}</span></div>`,txt:x=>`<p class="t">${x[0]}</p>`,big:x=>`<div class="ctr"><b>${x[0]}</b>${x[1]}</div>`,
+opt:x=>`<div class="opt"><i${x[0][0]=='*'?' class="a"':''}></i><span>${x[0].replace('*','')}</span><em>${x[1]||''}</em></div>`,steps:x=>x[0].split('|').map(t=>T.opt([t])).join(''),
+map:()=>'<div class="map"><b style="left:30%;top:40%"></b><b style="left:62%;top:25%"></b><b style="left:48%;top:66%"></b></div>',toast:x=>`<div class="toast">${x[0]}</div>`};
+var P=function(sc,r){return '<div class="ph"'+(r?' dir="rtl"':'')+'>'+sc.map(function(a){return T[a[0]](a.slice(1))}).join('')+'</div>'};
+var BR=['bar','Marrybrown','Cart'],CH=['chips','*Deals,Chicken,Family,Burgers'],BM=['row','Big Meal','AED 32'],M2=['row','Meal for Two','AED 49'],WG=['row','Chicken Wings','6 pc. AED 24'];
+var X=[
+{h:'Getting started',f:[['<b>Language and location.</b> Three choices on one screen.',[['bar','Marrybrown'],['seg','*English|العربية'],['lbl','How do you want it?'],['seg','*Delivery|Pickup'],['field','Address','Enter your address'],['btn','Use my location']]],
+['<b>Branch picker.</b> Nearest open branch first, with hours and distance.',[['bar','Pick a branch','Pickup'],['row','Al Barsha','Open until 1am. 1.2 km','Select'],['row','Burjuman','Open until 11pm. 6.4 km','Select'],['row','Dubai Airport','Open 24/7. 14 km','Select'],['btn','Confirm branch']]],
+['<b>Delivery estimate.</b> Time and minimum order shown before the cart.',[BR,['field','Deliver to','Al Barsha, Dubai'],['txt','Delivering from Al Barsha. 25 to 35 min. Minimum order AED 30.'],['hero','Free delivery over AED 60','Add AED 12 more','See deals']]]]},
+{h:'Home and deals',f:[['<b>Home, scrolled.</b> Bestsellers and deals sit right under the order box.',[BR,['lbl','Bestsellers'],BM,M2,['lbl','Top deals'],['row','Family Feast','AED 95']]],
+['<b>Deals.</b> Clear end dates, prices as text.',[['bar','Deals','Cart'],['chips','*All,Limited time,Family,Bowls'],['row','Smoky Grilled Bowl','Ends 5 Oct. AED 13'],['row','Mac N Cheese','Ends 5 Oct. AED 15'],['row','Spicy Wrap','Ends 12 Oct. AED 12']]],
+['<b>Search.</b> Find an item in two taps.',[['bar','Search'],['field','Search','wings'],WG,['row','Wings and Fries','AED 28'],['txt','Try: burger, meal, dessert']]]]},
+{h:'Choosing and customising',f:[['<b>Product.</b> Choices are large, tappable options.',[['bar','Big Meal','Back'],['lbl','Choose your chicken'],['opt','*Original'],['opt','Spicy','+ AED 0'],['lbl','Choose your side'],['opt','*Fries'],['btn','Add to cart. AED 32']]],
+['<b>Combo builder.</b> Pick sides and drinks in one screen.',[['bar','Meal for Two','Back'],['lbl','Pick 2 sides'],['opt','*Fries','x1'],['opt','*Coleslaw','x1'],['lbl','Pick 2 drinks'],['opt','*Pepsi','x2'],['btn','Add to cart. AED 49']]],
+['<b>Added.</b> Confirmation without leaving the menu.',[BR,CH,BM,M2,['toast','Big Meal added'],['cart','1 item, AED 32','View cart']]]]},
+{h:'Cart',f:[['<b>Cart.</b> Quantities and total in one glance.',[['bar','Your cart','Close'],['row','Big Meal','AED 32','- 1 +'],['row','Meal for Two','AED 49','- 1 +'],['tot','Subtotal','AED 81'],['btn','Checkout']]],
+['<b>One-tap upsell.</b> Suggest a drink or dessert.',[['bar','Your cart','Close'],['row','Big Meal','AED 32','- 1 +'],['lbl','Add a drink?'],['row','Pepsi','AED 6'],['row','Brownie','AED 8'],['btn','Checkout. AED 32']]],
+['<b>Empty cart.</b> An invitation to start, not a dead end.',[['bar','Your cart','Close'],['txt','Your cart is empty. Start with a bestseller.'],BM,WG,['btn','Browse the menu']]]]},
+{h:'Checkout to tracking',f:[['<b>Details.</b> One page, no account.',[['bar','Checkout','One page'],['field','Phone','+971 5X XXX XXXX'],['field','Address','Al Barsha, Dubai'],['field','Notes for the rider','Gate code 1234'],['field','Time','As soon as possible. 25 to 35 min'],['btn','Pay AED 81']]],
+['<b>Confirmation.</b> Rewards sign-up comes after payment.',[['bar','Order placed'],['big','Thanks. Order 1042','Ready in 25 to 35 min'],['btn','Track order'],['txt','Save your details for next time with one tap.']]],
+['<b>Live tracking.</b> Received to delivered.',[['bar','Order 1042','25 min'],['lbl','Status'],['steps','*Received|*Being prepared|On the way|Delivered'],['txt','Al Barsha branch is preparing your order.']]]]},
+{h:'Account and rewards',f:[['<b>Sign in by text.</b> No password to remember.',[['bar','Sign in'],['field','Mobile number','+971 5X XXX XXXX'],['btn','Send code'],['txt','We text you a code.'],['btn','Continue as guest']]],
+['<b>Rewards.</b> Points shown where customers order.',[['bar','Rewards'],['big','240 points','60 more for a free Mac N Cheese'],['row','Free drink','100 points','Redeem'],['row','Free wings','200 points','Redeem']]],
+['<b>Order again.</b> Repeat a past order in one tap.',[['bar','My orders'],['lbl','Last order. 12 Sep'],['row','Big Meal','AED 32','x1'],WG,['btn','Order again. AED 56'],['field','Saved address','Home. Al Barsha, Dubai']]]]},
+{h:'Branches and directions',f:[['<b>Store map.</b> Loads fast, shows all 7 branches.',[['bar','Branches'],['map'],['btn','Find my nearest branch'],['row','Al Barsha','Open until 1am','Select']]],
+['<b>All branches.</b> Address, phone and hours at a glance.',[['bar','All branches'],['row','Al Barsha','+971 4 227 7912. 10am to 1am','Call'],['row','Burjuman','+971 4 398 7155. 10am to 11pm','Call'],['row','Dubai Airport','+971 4 388 4156. Open 24/7','Call'],['txt','And 4 more branches.']]],
+['<b>Directions.</b> One tap to Maps.',[['bar','Al Barsha','Back'],['map'],['txt','12 min drive. Open until 1am.'],['btn','Open in Maps'],['btn','Order from here']]]]},
+{h:'When something goes wrong',f:[['<b>Page not found.</b> Search, categories and Order now.',[BR,['big','This page is missing','Search or start an order'],['field','Search','Search the menu'],CH,['btn','Order now']]],
+['<b>Branch closed.</b> Say when it opens and offer options.',[['bar','Marrybrown'],['big','Al Barsha is closed','Opens at 10am'],['btn','Schedule for later'],['btn','Try another branch']]],
+['<b>Outside delivery area.</b> Offer pickup instead.',[['bar','Delivery'],['big','We do not deliver here yet','Switch to pickup or try another address'],['btn','Switch to pickup'],['field','Address','Change address']]]]},
+{h:'Arabic, right to left',f:[['<b>Home.</b> Same layout, mirrored.',[['bar','ماري براون','السلة'],['seg','*التوصيل|الاستلام'],['field','التوصيل إلى','البرشاء، دبي'],['hero','دجاج مشوي مدخن','أطباق من ١٣ درهم','اطلب الآن'],['chips','*العروض,الدجاج,العائلة']],1],
+['<b>Menu.</b> One-tap language switch from any screen.',[['bar','ماري براون','السلة'],['chips','*العروض,الدجاج,العائلة,البرجر'],['row','بيج ميل','٣٢ درهم'],['row','وجبة لشخصين','٤٩ درهم'],['row','ماك آند تشيز','١٥ درهم'],['cart','عنصران، ٨١ درهم','عرض السلة']],1],
+['<b>Checkout.</b> Apple Pay and Google Pay in Arabic too.',[['bar','الدفع','بدون حساب'],['field','الهاتف','+971 5X XXX XXXX'],['field','العنوان','البرشاء، دبي'],['lbl','الدفع بواسطة'],['pay','*أبل باي|جوجل باي|بطاقة|نقداً'],['btn','ادفع ٨١ درهم']],1]]},
+{h:'One design system',html:'<table><tr><th>Element</th><th>Rule</th></tr><tr><td>Text</td><td>One typeface. Four sizes: 28, 20, 16 and 13 px</td></tr><tr><td>Buttons</td><td>Three styles only: primary, secondary, text. Today there are four or more</td></tr><tr><td>Tap targets</td><td>At least 44 px tall</td></tr><tr><td>Prices</td><td>Always text, never part of a picture</td></tr><tr><td>Photos</td><td>Square, matching backgrounds, under 60 KB each</td></tr><tr><td>Spacing</td><td>One 8 px grid on every page</td></tr></table>'},
+{h:'Three taps to checkout',html:'<div class="flow"><div class="box"><b>Home</b>Tap Order now</div><div class="box"><b>Menu</b>Tap + on an item</div><div class="box"><b>Cart bar</b>Tap View cart</div><div class="box"><b>Checkout</b>Pay on one page</div></div><p class="big mut" style="margin-top:24px">Today it takes 5 to 6 taps to reach checkout with one item.</p>'},
+{h:'How we reach the speed targets',html:'<table><tr><th>Fix</th><th>Result</th></tr><tr><td>Turn on page caching, create carts only on add-to-cart</td><td>Page starts in under 1 sec, from about 6</td></tr><tr><td>One page builder, no slider tool, no duplicate add-ons</td><td>Files drop from 350 to under 60</td></tr><tr><td>Load the video once, only when needed</td><td>7.5 MB down to under 1 MB</td></tr><tr><td>WebP images and phone banners</td><td>Category pictures from 756 KB to under 60 KB</td></tr><tr><td>All tracking in one Tag Manager container</td><td>7 tools become 1</td></tr><tr><td>Maps only on Locations and Checkout</td><td>2 to 3 copies become 1</td></tr></table>'},
+{h:'Google, accessibility and security',html:'<ul><li><b>Google.</b>Tell Google the site is a restaurant with 7 branches, use one site map and one clear main heading per page.</li><li><b>Accessibility.</b>Label the 30 unlabelled buttons, describe images, make every tap target 44 px, add a skip-to-content link.</li><li><b>Language.</b>Add Arabic and set the site to UAE English.</li><li><b>Security.</b>Hide the admin username, turn on two-step login, lock the Google Maps key, add the 5 missing browser security settings.</li></ul>'}];
+X.forEach(function(d,k){var e=document.createElement('section');e.className='slide';e.innerHTML='<h2>'+d.h+'</h2>'+(d.html||'<div class="phones">'+d.f.map(function(f){return '<div class="fig">'+P(f[1],f[2])+'<p>'+f[0]+'</p></div>'}).join('')+'</div><p class="mut" style="font-size:13px;margin-top:8px">Sketch only. Prices, times and branch details are examples.</p>');var r=document.querySelectorAll('.slide')[4+k];r.parentNode.insertBefore(e,r)});
+var s=document.querySelectorAll('.slide'),i=0;
+function go(k){i=Math.max(0,Math.min(s.length-1,k));s.forEach(function(e,j){e.classList.toggle('on',j===i)});document.getElementById('c').textContent=(i+1)+' / '+s.length}
+document.getElementById('p').onclick=function(){go(i-1)};
+document.getElementById('n').onclick=function(){go(i+1)};
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' ')go(i+1);if(e.key==='ArrowLeft')go(i-1)});
+</script>
+</body>
+</html>
